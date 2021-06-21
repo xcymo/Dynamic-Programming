@@ -1,149 +1,151 @@
-function getMin(){
-  let arr = Array.from(arguments).map(v=>{
+function getMax(){
+  let arr = Array.from(arguments)
+  arr = arr.map(v=>{
     return Number(v)
   })
-  arr.sort((v1, v2) => {
-    return v2 - v1
-  })
+  arr.sort((v1, v2)=>v1-v2)
   return arr.pop()
 }
-function sleep(time){
-  return new Promise((resolve)=>{
-    setTimeout(() => {
-      resolve()
-    }, time);
+function getMin(){
+  let arr = Array.from(arguments)
+  arr = arr.map(v=>{
+    return Number(v)
   })
+  arr.sort((v1, v2)=>v2-v1)
+  return arr.pop()
 }
 
-// 单词替换问题
+// 青蛙跳
+// 一只青蛙可以一次跳 1 级台阶或者一次跳 2 级台阶，例如：
+// 跳上第 1 级台阶只有一种跳法：直接跳 1 级即可。
+// 跳上第 2 级台阶有两种跳法：每次跳 1 级，跳两次；或者一次跳 2 级。
+// 问要跳上第 n 级台阶有多少种跳法？
+function frog(steps){
+  // 定义dp，dp[n]为青蛙跳到n级台阶的跳法数
+  let dp = new Array(steps + 1)
+  // 初始化数值
+  dp[0] = 0
+  dp[1] = 1
+  dp[2] = 2
+  for(let i = 3; i < dp.length; i++){
+    // 状态转移方程
+    dp[i] = dp[i-1] + dp[i-2]
+  }
+  console.log(dp)
+}
+// frog(1)
 
-function word_change(word1='', word2=''){
-  let m = word1.length + 1
-  let n = word2.length + 1
-  if(m == 0){
-    return n
-  }
-  if(n == 0){
-    return m
-  }
+
+// 机器人走棋盘(计算有多少种路径)
+// 有一个长m宽n的棋盘，左上角有一个机器人，他每次只能向右或向下移动一格，问走到右下角共有几种走法？
+function robot_chess1(m, n){
   let dp = new Array(m)
   dp.fill(0)
   dp = dp.map(v=>{
     return new Array(n).fill(0)
   })
-  
   for(let i = 0; i < m; i++){
-    dp[i][0] = i
+    dp[i][n-1] = 1
   }
   for(let j = 0; j < n; j++){
-    dp[0][j] = j
+    dp[m-1][j] = 1
   }
-  dp.forEach(v=>{
-    console.log(v)
-  })
-  console.log('===========')
-  for(let i = 1; i < m; i++){
-    for(let j = 1; j < n; j++){
-      if(word1[i - 1] == word2[j - 1]){
-        dp[i][j] = dp[i-1][j - 1]
-      } else {
-        // 插入
-        let value1 = dp[i][j - 1] + 1
-        // 删除
-        let value2 = dp[i - 1][j] + 1
-        // 替换
-        let value3 = dp[i - 1][j - 1] + 1
-        dp[i][j] = getMin(value1, value2, value3)
-      }
+  for(let i = m - 2; i >= 0; i--){
+    for(let j = n - 2; j >= 0; j--){
+      dp[i][j] = dp[i+1][j] + dp[i][j+1]
     }
   }
+  
   dp.forEach(v=>{
     console.log(v)
   })
 }
+// robot_chess1(5,6)
 
-// word_change('baby', 'water')
-
-
-function longestPalindrome(s) {
-  let arr = s.split('')
-  let dp = new Array(arr.length)
-  dp.fill(0)
-  dp = dp.map(v=>{
-    return new Array(arr.length).fill(0)
-  })
-  for(let i = 0; i < arr.length; i++){
-    dp[i][i] = 1
-  }
-  console.log(dp)
-  for(let i = 0; i < arr.length; i++){
-    for(let j = arr.length - 1; j >= 0; j--){
-      dp[i][j] = Number(s[i] == s[j] && (j - i < 3 || dp[i+1][j-1]))
-    }
-  }
-  dp.forEach(v=>[
-    console.log(v)
-  ])
-};
-
-// longestPalindrome('poop')
-
-
-// 最大矩形
+// 机器人走棋盘-有障碍物的版本
 /**
- * @param {character[][]} matrix
+ * @param {number[][]} obstacleGrid
  * @return {number}
  */
-var maximalRectangle = async function(matrix) {
-  let m = matrix.length
-  let n = matrix[0].length
+ function uniquePathsWithObstacles(obstacleGrid) {
+  let m = obstacleGrid.length
+  let n = obstacleGrid[0].length
   let dp = new Array(m).fill(0)
   dp = dp.map(v=>{
     return new Array(n).fill(0)
   })
+  // 初始化数据
   for(let i = 0; i < m; i++){
-    for(let j = 0; j < n; j++){
-      if(matrix[i][j] == 0){
-        dp[i][j] = [0, 0]
+    if(obstacleGrid[i][0] != 1){
+      dp[i][0] = 1
+    } else {
+      break
+    }
+  }
+  for(let j = 0; j < n; j++){
+    if(obstacleGrid[0][j] != 1){
+      dp[0][j] = 1
+    } else {
+      break
+    }
+  }
+  for(let i = 1; i < m; i++){
+    for(let j = 1; j < n; j++){
+      if(obstacleGrid[i][j] == 1){
+        dp[i][j] = 0
       } else {
-        dp[i][j] = [1, 1]
-        let x_break = false
-        let y_break = false
-        let cur_direction = 'x'
-        let x = 0
-        let y = 0
-        while(!x_break || !y_break){
-          await sleep(500)
-          if(!x_break && cur_direction == 'x'){
-            x++
-            for(let c_y = j; c_y <= j + y; c_y++){
-              console.log()
-              if(matrix[i+x][c_y] == 0){
-                x_break = true
-                x--
-                break
-              }
-            }
-            cur_direction = 'y'
-          }
-          if(!y_break && cur_direction == 'y'){
-            y++
-            for(let c_x = i; c_x <= i + x; c_x++){
-              if(matrix[c_x][j+y] == 0){
-                y_break = true
-                y--
-                break
-              }
-            }
-            cur_direction = 'x'
-          }
-        }
-        dp[i][j] = [x, y]
+        dp[i][j] = dp[i-1][j] + dp[i][j-1] 
       }
     }
   }
-  console.log(dp)
+  console.log(dp[m-1][n-1])
 };
+// let obstacleGrid = [[0,1],[0,0]]
+// uniquePathsWithObstacles(obstacleGrid)
 
-let matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
-maximalRectangle(matrix)
+// 背包问题
+/**
+ * 一个小偷去偷东西，背着一个容量为 $W$ 的背包，
+ * 屋子主人共有 $N $件物品，
+ * 其中第 $k$ 件物品的重量为$weight[k]$，价值为$value[k]$，
+ * 问小偷最多能偷到价值为多少的物品？
+ */
+function knapsack(capacity, items){
+  capacity = capacity + 1
+  items = [[0, 0], ...items]
+  let dp = new Array(items.length).fill(0)
+  dp = dp.map(v=>{
+    return new Array(capacity).fill(0)
+  })
+  // 初始化
+  for(let k = 0; k < items.length; k++){
+    dp[k][0] = 0
+  }
+  for(let W = 0; W < capacity; W++){
+    if(W >= items[0][0]){
+      dp[0][W] = items[0][1]
+    } else {
+      dp[0][W] = 0
+    }
+  }
+  for(let k = 1; k < items.length; k++){
+    for(let W = 1; W < capacity; W++){
+      if(items[k][0] > W){
+        dp[k][W] = 0
+      } else {
+        let value1 = dp[k-1][W-items[k][0]] + items[k][1]
+        let value2 = dp[k-1][W]
+        dp[k][W] = value1 > value2 ? value1 : value2
+      }      
+    }
+  }
+  console.log(dp)
+}
+
+let capacity = 4
+let items = [
+  [1, 10],
+  [3, 25],
+  [4, 30]
+]
+knapsack(capacity, items)
