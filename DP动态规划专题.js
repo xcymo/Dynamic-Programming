@@ -100,7 +100,11 @@ function robot_chess1(m, n){
   }
   console.log(dp[m-1][n-1])
 };
-// let obstacleGrid = [[0,1],[0,0]]
+// let obstacleGrid = [
+//   [0,0,1,0,1],
+//   [0,0,0,0,0],
+//   [0,1,0,0,0]
+// ]
 // uniquePathsWithObstacles(obstacleGrid)
 
 // 背包问题
@@ -113,33 +117,42 @@ function robot_chess1(m, n){
 function knapsack(capacity, items){
   capacity = capacity + 1
   items = [[0, 0], ...items]
+  // 物品重量
+  let weight = []
+  // 物品价值
+  let value = []
+  items.forEach(v=>{
+    weight.push(v[0])
+    value.push(v[1])
+  })
   let dp = new Array(items.length).fill(0)
   dp = dp.map(v=>{
     return new Array(capacity).fill(0)
   })
-  // 初始化
-  for(let k = 0; k < items.length; k++){
-    dp[k][0] = 0
-  }
-  for(let W = 0; W < capacity; W++){
-    if(W >= items[0][0]){
-      dp[0][W] = items[0][1]
-    } else {
-      dp[0][W] = 0
-    }
-  }
+  // 初始化可以省略，因为我们已经添加了0号物品，并将背包承重+1了
+  // for(let k = 0; k < items.length; k++){
+  //   dp[k][0] = 0
+  // }
+  // for(let W = 0; W < capacity; W++){
+  //   if(W >= items[0][0]){
+  //     dp[0][W] = items[0][1]
+  //   } else {
+  //     dp[0][W] = 0
+  //   }
+  // }
   for(let k = 1; k < items.length; k++){
     for(let W = 1; W < capacity; W++){
-      if(items[k][0] > W){
-        dp[k][W] = 0
+      if(weight[k] > W){
+        dp[k][W] = dp[k-1][W]
       } else {
-        let value1 = dp[k-1][W-items[k][0]] + items[k][1]
+        let value1 = dp[k-1][W-weight[k]] + value[k]
         let value2 = dp[k-1][W]
-        dp[k][W] = value1 > value2 ? value1 : value2
+        dp[k][W] = getMax(value1, value2)
       }      
     }
   }
-  console.log(dp)
+  // console.log(dp)
+  console.log(dp[items.length-1][capacity-1])
 }
 
 let capacity = 4
